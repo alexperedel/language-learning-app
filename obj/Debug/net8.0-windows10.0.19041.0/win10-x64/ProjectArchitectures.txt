@@ -1,0 +1,1 @@
+C:\Users\PEREDA.TDM\source\repos\LearningApp\LearningApp\LearningApp.csproj;x64
