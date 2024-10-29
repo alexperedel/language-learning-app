@@ -9,5 +9,11 @@
                    SearchButtonPressed="OnSearchButtonPressed" 
                    TextChanged="OnTextChanged" />
         </StackLayout>
+
+        <ScrollView>
+            <VerticalStackLayout x:Name="ContentArea"
+                                 Padding="10">
+            </VerticalStackLayout>
+        </ScrollView>
     </VerticalStackLayout>
 </ContentPage>

@@ -4,56 +4,95 @@ namespace LearningApp;
 
 public partial class SearchPage : ContentPage
 {
-    private readonly HttpClient _httpClient = new HttpClient();
-    public SearchPage()
-	{
-		InitializeComponent();
+    private readonly DictionaryService _dictionaryService = new DictionaryService();
 
-	}
+    public SearchPage()
+    {
+        InitializeComponent();
+    }
 
     private async void OnSearchButtonPressed(object sender, EventArgs e)
     {
         var searchBar = (SearchBar)sender;
         string query = searchBar.Text;
+
         if (!string.IsNullOrEmpty(query))
         {
-            await SearchApiAsync(query);
-        }
-    }
-
-    private async Task SearchApiAsync(string query)
-    {
-        string apiUrl = $"https://api.dictionaryapi.dev/api/v2/entries/en/{query}";
-
-        try
-        {
-            HttpResponseMessage response = await _httpClient.GetAsync(apiUrl);
-            response.EnsureSuccessStatusCode();
-
-            string jsonData = await response.Content.ReadAsStringAsync();
-            List<Words>? wordMeanings = JsonConvert.DeserializeObject<List<Words>>(jsonData);
-
-            if (wordMeanings != null && wordMeanings.Count > 0)
+            var wordData = await _dictionaryService.SearchWordAsync(query);
+            if (wordData != null)
             {
-                foreach (var wordMeaning in wordMeanings)
-                {
-                    Console.WriteLine(wordMeaning);
-                }
-                var firstWord = wordMeanings[0];
-                Console.WriteLine($"Word: {firstWord.Word}");
-                foreach (var phonetic in firstWord.Phonetics ?? new List<Phonetic>())
-                {
-                    Console.WriteLine($"Phonetic: {phonetic.Text}");
-                }
-                firstWord.ExtractPartsOfSpeech();
+                DisplayWordDetails(wordData);
+            }
+            else
+            {
+                await DisplayAlert("Error", "Word not found or request failed.", "OK");
             }
         }
-        catch (HttpRequestException ex)
-        {
-            Console.WriteLine($"Request error: {ex.Message}");
-        }
+
+        searchBar.Text = string.Empty;
+        searchBar.Unfocus();
     }
 
+    private void DisplayWordDetails(Words wordData)
+    {
+        ContentArea.Children.Clear();
+
+        // Display the Word
+        ContentArea.Children.Add(new Label
+        {
+            Text = wordData.Word,
+            FontAttributes = FontAttributes.Bold,
+            FontSize = 24,
+            HorizontalOptions = LayoutOptions.Center
+        });
+
+        // Display Phonetics
+        if (wordData.Phonetics != null && wordData.Phonetics.Count > 0)
+        {
+            ContentArea.Children.Add(new Label
+            {
+                Text = "Phonetics:",
+                FontAttributes = FontAttributes.Bold,
+                FontSize = 18,
+                Margin = new Thickness(0, 10, 0, 5)
+            });
+
+            foreach (var phonetic in wordData.Phonetics)
+            {
+                ContentArea.Children.Add(new Label
+                {
+                    Text = phonetic.Text,
+                    FontSize = 16
+                });
+            }
+        }
+
+        // Display Meanings and Definitions by Part of Speech
+        if (wordData.Meanings != null && wordData.Meanings.Count > 0)
+        {
+            foreach (var meaning in wordData.Meanings)
+            {
+                ContentArea.Children.Add(new Label
+                {
+                    Text = char.ToUpper(meaning.PartOfSpeech[0]) + meaning.PartOfSpeech.Substring(1) + ":",
+                    FontAttributes = FontAttributes.Bold,
+                    FontSize = 18,
+                    Margin = new Thickness(0, 10, 0, 5)
+                });
+
+                // Display the first definition only
+                if (meaning.Definitions != null && meaning.Definitions.Count > 0)
+                {
+                    ContentArea.Children.Add(new Label
+                    {
+                        Text = meaning.Definitions[0].DefinitionText,
+                        FontSize = 16,
+                        Margin = new Thickness(10, 0, 0, 5)
+                    });
+                }
+            }
+        }
+    }
     private void OnTextChanged(object sender, TextChangedEventArgs e)
     {
         string newText = e.NewTextValue;

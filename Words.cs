@@ -4,21 +4,24 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
+using System;
+using System.Collections.Generic;
+using System.Net.Http;
+using System.Threading.Tasks;
+using Newtonsoft.Json;
+
 namespace LearningApp
 {
     public class Phonetic
     {
         public string? Text { get; set; }
         public string? Audio { get; set; }
-        public string? SourceUrl { get; set; }
     }
-
 
     public class Definition
     {
+        [JsonProperty("definition")]
         public string? DefinitionText { get; set; }
-        public List<string>? Synonyms { get; set; }
-        public List<string>? Antonyms { get; set; }
         public string? Example { get; set; }
     }
 
@@ -26,8 +29,6 @@ namespace LearningApp
     {
         public string? PartOfSpeech { get; set; }
         public List<Definition>? Definitions { get; set; }
-        public List<string>? Synonyms { get; set; }
-        public List<string>? Antonyms { get; set; }
     }
 
     public class Words
@@ -45,28 +46,35 @@ namespace LearningApp
 
         public void ExtractPartsOfSpeech()
         {
-            string? nounDefinition = null;
-            string? verbDefinition = null;
-            string? adjectiveDefinition = null;
-            string? adverbDefinition = null;
+            string nounDefinition = "Not available";
+            string verbDefinition = "Not available";
+            string adjectiveDefinition = "Not available";
+            string adverbDefinition = "Not available";
 
-            foreach (var meaning in Meanings)
+            if (Meanings != null)
             {
-                if (meaning.PartOfSpeech == "noun" && nounDefinition == null)
+                foreach (var meaning in Meanings)
                 {
-                    nounDefinition = meaning.Definitions?[0].DefinitionText;
-                }
-                else if (meaning.PartOfSpeech == "verb" && verbDefinition == null)
-                {
-                    verbDefinition = meaning.Definitions?[0].DefinitionText;
-                }
-                else if (meaning.PartOfSpeech == "adjective" && adjectiveDefinition == null)
-                {
-                    adjectiveDefinition = meaning.Definitions?[0].DefinitionText;
-                }
-                else if (meaning.PartOfSpeech == "adverb" && adverbDefinition == null)
-                {
-                    adverbDefinition = meaning.Definitions?[0].DefinitionText;
+                    if (meaning.Definitions != null && meaning.Definitions.Count > 0)
+                    {
+                        var firstDefinition = meaning.Definitions[0].DefinitionText;
+
+                        switch (meaning.PartOfSpeech)
+                        {
+                            case "noun" when nounDefinition == "Not available":
+                                nounDefinition = firstDefinition;
+                                break;
+                            case "verb" when verbDefinition == "Not available":
+                                verbDefinition = firstDefinition;
+                                break;
+                            case "adjective" when adjectiveDefinition == "Not available":
+                                adjectiveDefinition = firstDefinition;
+                                break;
+                            case "adverb" when adverbDefinition == "Not available":
+                                adverbDefinition = firstDefinition;
+                                break;
+                        }
+                    }
                 }
             }
 
