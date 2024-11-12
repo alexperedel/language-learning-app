@@ -8,10 +8,16 @@
         {
             InitializeComponent();
         }
+        
 
         private void OnImageButtonClicked(object sender, EventArgs e)
         {
 
+        }
+
+        private async void SwitchToDictionaryPage(object sender, EventArgs e)
+        {
+            await Navigation.PushAsync(new DictionaryPage());
         }
 
         private async void SwitchToSearchPage(object sender, EventArgs e)

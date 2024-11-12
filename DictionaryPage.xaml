@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<ContentPage xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+             x:Class="LearningApp.DictionaryPage"
+             Title="Dictionary Page">
+
+    <VerticalStackLayout Padding="10">
+        <SearchBar x:Name="wordSearchBar"
+                   Placeholder="Search for a word"
+                   TextChanged="OnSearchTextChanged" />
+
+        <ListView x:Name="wordListView"
+                  ItemTapped="OnWordTapped"
+                  IsPullToRefreshEnabled="True"
+                  BackgroundColor="LightGray" 
+                  HasUnevenRows="True">
+            <ListView.ItemTemplate>
+                <DataTemplate>
+                    <TextCell Text="{Binding}" />
+                </DataTemplate>
+            </ListView.ItemTemplate>
+        </ListView>
+    </VerticalStackLayout>
+</ContentPage>

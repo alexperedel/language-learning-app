@@ -29,6 +29,7 @@
                 BackgroundColor="Blue" 
                 TextColor="White" 
                 CornerRadius="20"
+                Clicked="SwitchToDictionaryPage"
                 Grid.ColumnSpan="3"
                 Margin="5"
                 WidthRequest="350" 

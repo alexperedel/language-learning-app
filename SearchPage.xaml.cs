@@ -5,10 +5,14 @@ namespace LearningApp;
 public partial class SearchPage : ContentPage
 {
     private readonly DictionaryService _dictionaryService = new DictionaryService();
+    private readonly DatabaseService _databaseService;
+    private string ?_currentWordText;
 
     public SearchPage()
     {
         InitializeComponent();
+        var dbPath = Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData), "words.db3"); ;
+        _databaseService = new DatabaseService(dbPath);
     }
 
     private async void OnSearchButtonPressed(object sender, EventArgs e)
@@ -21,6 +25,7 @@ public partial class SearchPage : ContentPage
             var wordData = await _dictionaryService.SearchWordAsync(query);
             if (wordData != null)
             {
+                _currentWordText = wordData.Word;
                 DisplayWordDetails(wordData);
             }
             else
@@ -37,7 +42,6 @@ public partial class SearchPage : ContentPage
     {
         ContentArea.Children.Clear();
 
-        // Display the Word
         ContentArea.Children.Add(new Label
         {
             Text = wordData.Word,
@@ -46,7 +50,6 @@ public partial class SearchPage : ContentPage
             HorizontalOptions = LayoutOptions.Center
         });
 
-        // Display Phonetics
         if (wordData.Phonetics != null && wordData.Phonetics.Count > 0)
         {
             ContentArea.Children.Add(new Label
@@ -67,7 +70,6 @@ public partial class SearchPage : ContentPage
             }
         }
 
-        // Display Meanings and Definitions by Part of Speech
         if (wordData.Meanings != null && wordData.Meanings.Count > 0)
         {
             foreach (var meaning in wordData.Meanings)
@@ -80,7 +82,6 @@ public partial class SearchPage : ContentPage
                     Margin = new Thickness(0, 10, 0, 5)
                 });
 
-                // Display the first definition only
                 if (meaning.Definitions != null && meaning.Definitions.Count > 0)
                 {
                     ContentArea.Children.Add(new Label
@@ -92,7 +93,27 @@ public partial class SearchPage : ContentPage
                 }
             }
         }
+
+        var addWordButton = new Button
+        {
+            Text = "Add Word",
+            Margin = new Thickness(0, 20, 0, 0),
+            HorizontalOptions = LayoutOptions.Center
+        };
+        addWordButton.Clicked += OnAddWordButtonClicked;
+
+        ContentArea.Children.Add(addWordButton);
+
     }
+
+    private async void OnAddWordButtonClicked(object sender, EventArgs e)
+    {
+        if (string.IsNullOrEmpty(_currentWordText)) return;
+
+        await _databaseService.AddWordAsync(_currentWordText);
+        await DisplayAlert("Add Word", "The word has been added successfully!", "OK");
+    }
+
     private void OnTextChanged(object sender, TextChangedEventArgs e)
     {
         string newText = e.NewTextValue;
