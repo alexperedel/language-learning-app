@@ -22,20 +22,29 @@ namespace LearningApp
             return _database.ExecuteAsync("INSERT OR IGNORE INTO Words (Text) VALUES (?)", word);
         }
 
+        public Task<int> RemoveWordAsync(string word)
+        {
+            return _database.ExecuteAsync("DELETE FROM Words WHERE Text = ?", word);
+        }
+
         public Task<string> GetWordAsync(string word)
         {
             return _database.ExecuteScalarAsync<string>("SELECT Text FROM Words WHERE Text = ?", word);
         }
 
+        public Task<string> DynamicWordSearchAsync(string word)
+        {
+            return _database.ExecuteScalarAsync<string>("SELECT Text FROM Words WHERE Text = ? ORDER BY Text ASC", word + "%");
+        }
+
+
         async public Task<List<Word>> GetWordsAsync()
         {
-            var query = "SELECT Text FROM Words";  // Query to fetch all rows
-            //await _database.OpenAsync();  // Open the connection if not open already
+            var query = "SELECT Text FROM Words";  
 
-            // Use Dapper to execute the query and map the results directly to a collection
             var words = await _database.QueryAsync<Word>(query);
 
-            return words;  // Return the collection of words
+            return words;
         }
     }
 }
