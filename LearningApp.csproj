@@ -57,7 +57,9 @@
 	</ItemGroup>
 
 	<ItemGroup>
+	  <None Remove="Resources\Images\dictionary.png" />
 	  <None Remove="Resources\Images\home_button.png" />
+	  <None Remove="Resources\Images\library.png" />
 	</ItemGroup>
 
 	<ItemGroup>

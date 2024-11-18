@@ -1,3 +1,4 @@
+using System.Collections;
 using System.ComponentModel.Design;
 
 namespace LearningApp;
@@ -6,13 +7,15 @@ public partial class WordDefinitionPage : ContentPage
 {
     private string? _currentWordText;
     private readonly DictionaryService _dictionaryService = new DictionaryService();
+    private readonly Action<string>? _onWordRemoved;
     private readonly DatabaseService _databaseService;
 
-    public WordDefinitionPage(string definition)
+    public WordDefinitionPage(string definition, Action<string> onWordRemoved = null)
     {
         InitializeComponent();
         var dbPath = Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData), "words.db3"); ;
         _databaseService = new DatabaseService(dbPath);
+        _onWordRemoved = onWordRemoved;
         SearchDefinition(definition);
     }
 
@@ -37,9 +40,9 @@ public partial class WordDefinitionPage : ContentPage
 
     private async void OnCloseButtonClicked(object sender, EventArgs e)
     {
-        // Close the modal page
         await Navigation.PopModalAsync();
     }
+
 
     private void DisplayWordDetails(Words wordData)
     {
@@ -112,8 +115,10 @@ public partial class WordDefinitionPage : ContentPage
     private async void OnRemovedWordButtonClicked(object sender, EventArgs e)
     {
         if (string.IsNullOrEmpty(_currentWordText)) return;
-
         await _databaseService.RemoveWordAsync(_currentWordText);
+
+        _onWordRemoved?.Invoke(_currentWordText);
+
         await DisplayAlert("Remove Word", "The word has been removed successfully!", "OK");
     }
 }

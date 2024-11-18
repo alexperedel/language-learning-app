@@ -1,96 +1,88 @@
 using Microsoft.Maui.Controls;
+using System.Linq;
 
 namespace LearningApp;
 
 public partial class DictionaryPage : ContentPage
 {
-
     private DatabaseService _databaseService;
     private List<Word> _words;
 
     public DictionaryPage()
-	{
-		InitializeComponent();
+    {
+        InitializeComponent();
         var dbPath = Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData), "words.db3");
 
         _databaseService = new DatabaseService(dbPath);
 
+        // Initialize word list
+        _words = new List<Word>();
         LoadWordsAsync();
     }
 
-    private async void LoadWordsAsync()
+    private async Task LoadWordsAsync()
     {
         _words = await _databaseService.GetWordsAsync();
-        List<String> wordsName = new List<String>();
+        PopulateWordList(_words);
+    }
 
-        if (_words.Count == 0)
+    private void PopulateWordList(IEnumerable<Word> words)
+    {
+        if (!words.Any())
         {
-            noResultsLabel.IsVisible = true;
+            ToggleNoResultsLabel(true);
         }
         else
         {
-            noResultsLabel.IsVisible = false;
-            foreach (Word word in _words)
-            {
-                wordsName.Add(word.Text);
-            }
-            wordListView.ItemsSource = wordsName;
+            ToggleNoResultsLabel(false);
+            wordListView.ItemsSource = words.Select(word => word.Text).ToList();
         }
     }
 
-        private void OnSearchTextChanged(object sender, TextChangedEventArgs e)
+    private void ToggleNoResultsLabel(bool isVisible)
     {
-        var searchQuery = wordSearchBar.Text?.ToLower();
-        if (string.IsNullOrEmpty(searchQuery))
+        wordListView.ItemsSource = new List<Word>();
+        noResultsLabel.IsVisible = isVisible;
+    }
+
+    private void OnSearchTextChanged(object sender, TextChangedEventArgs e)
+    {
+        var searchQuery = e.NewTextValue?.ToLower();
+        if (string.IsNullOrWhiteSpace(searchQuery))
         {
-            LoadWordsAsync();
+            PopulateWordList(_words);
         }
         else
         {
-            wordListView.ItemsSource = new List<Word>();
-            var resultSearchQuery = _words.Where(word => word.Text.ToLower().StartsWith(searchQuery)).ToList();
-
-            List<String> wordsName = new List<String>();
-
-            if (resultSearchQuery.Count == 0)
-            {
-                noResultsLabel.IsVisible = true;
-            }
-            else
-            {
-                noResultsLabel.IsVisible = false;
-                foreach (Word word in resultSearchQuery)
-                {
-                    wordsName.Add(word.Text);
-                }
-                wordListView.ItemsSource = wordsName;  
-            }
-
+            var filteredWords = _words.Where(word => word.Text.ToLower().StartsWith(searchQuery)).ToList();
+            PopulateWordList(filteredWords);
         }
-
-        /*
-        else
-        {
-            _words.Where(word => word.Text.ToLower().Contains(searchQuery)).ToList();
-
-            List<String> wordsName = new List<String>();
-            foreach (Word word in _words)
-            {
-                wordsName.Add(word.Text);
-            }
-            wordListView.ItemsSource = new List<Word>();
-            wordListView.ItemsSource = wordsName;
-        }*/
     }
 
     private async void OnWordTapped(object sender, ItemTappedEventArgs e)
     {
-        if (e.Item != null)
+        if (e.Item == null) return;
+
+        wordSearchBar.Unfocus();
+
+        var tappedWord = e.Item.ToString();
+        var wordPage = new WordDefinitionPage(tappedWord, OnWordRemoved);
+        await Navigation.PushModalAsync(wordPage);
+    }
+
+    private void OnWordRemoved(string removedWord)
+    {
+        var wordToRemove = _words.FirstOrDefault(w => w.Text == removedWord);
+        if (wordToRemove != null)
         {
-            var tappedWord = e.Item.ToString();
-            await Navigation.PushModalAsync(new WordDefinitionPage(tappedWord));
-            LoadWordsAsync();
-            //await DisplayAlert("Word", wordDefinition ?? "Definition not found", "OK");
+            _words.Remove(wordToRemove);
+
+            if(wordSearchBar.Text.Length > 0)
+            {
+                var filteredWords = _words.Where(word => word.Text.ToLower().StartsWith(wordSearchBar.Text)).ToList();
+                PopulateWordList(filteredWords);
+            }
+            else { PopulateWordList(_words); }
         }
     }
 

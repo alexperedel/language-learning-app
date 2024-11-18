@@ -25,9 +25,8 @@
                 Margin="30, 5, 30, 20"
                 VerticalOptions="Start" />
 
-            <Button Text="Click Me" 
-                BackgroundColor="Blue" 
-                TextColor="White" 
+            <ImageButton Source="dictionary.png"
+                BackgroundColor="LightSkyBlue"  
                 CornerRadius="20"
                 Clicked="SwitchToDictionaryPage"
                 Grid.ColumnSpan="3"
@@ -44,10 +43,9 @@
                 Margin="30, 5, 30, 20"
                 VerticalOptions="Start" />
 
-            <Button Text="Click Me"
+            <ImageButton Source="library.png"
                 Grid.Row="1"
-                BackgroundColor="Blue" 
-                TextColor="White" 
+                BackgroundColor="LightSkyBlue" 
                 CornerRadius="20"
                 Grid.ColumnSpan="3"
                 Margin="5"
