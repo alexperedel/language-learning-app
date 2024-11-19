@@ -8,7 +8,7 @@
         {
             InitializeComponent();
         }
-        
+
 
         private void OnImageButtonClicked(object sender, EventArgs e)
         {
@@ -23,6 +23,11 @@
         private async void SwitchToSearchPage(object sender, EventArgs e)
         {
             await Navigation.PushAsync(new SearchPage());
+        }
+
+        private async void OnSettingsTapped(object sender, EventArgs e)
+        {
+            await Navigation.PushAsync(new SettingsPage());
         }
     }
 

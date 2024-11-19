@@ -3,15 +3,14 @@
              xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
              x:Class="LearningApp.DictionaryPage"
              Title="Dictionary Page"
-             BackgroundColor="#F1F1F1">
+             BackgroundColor="{StaticResource BackgroundColor}">
 
     <VerticalStackLayout Padding="15" Spacing="20">
         <SearchBar x:Name="wordSearchBar"
                    Placeholder="Search for a word"
                    TextChanged="OnSearchTextChanged"
-                   BackgroundColor="White"
-                   FontSize="16"
-                   TextColor="#333333"/>
+                   BackgroundColor="{StaticResource PickerBackgroundColor}"
+                   FontSize="16"/>
 
         <Label x:Name="noResultsLabel"
                Text="No results found"
@@ -24,17 +23,17 @@
         <ListView x:Name="wordListView"
                   ItemTapped="OnWordTapped"
                   IsPullToRefreshEnabled="True"
-                  BackgroundColor="White"
                   HasUnevenRows="True"
-                  SeparatorColor="#E0E0E0"
+                  SelectionMode="None"
+                  SeparatorColor="{StaticResource SecondaryColor}"
                   Margin="0,10,0,0">
             <ListView.ItemTemplate>
                 <DataTemplate>
                     <ViewCell>
                         <Grid Padding="15">
                             <Label Text="{Binding}" 
-                                   FontSize="18" 
-                                   TextColor="#333333"
+                                   FontSize="18"
+                                   TextColor="{StaticResource SecondaryColor}"
                                    VerticalOptions="Center" />
                         </Grid>
                     </ViewCell>

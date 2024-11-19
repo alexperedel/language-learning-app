@@ -3,13 +3,13 @@
              xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
              x:Class="LearningApp.WordDefinitionPage"
              Title="Word Definition"
-             BackgroundColor="#F1F1F1">
+             BackgroundColor="{StaticResource BackgroundColor}">
 
     <VerticalStackLayout Padding="15" Spacing="20">
         <Label x:Name="definitionLabel"
                Text="Word Definition"
                FontSize="20"
-               TextColor="#333333" />
+               TextColor="{StaticResource SecondaryColor}"/>
 
         <ScrollView>
             <VerticalStackLayout x:Name="ContentArea"
