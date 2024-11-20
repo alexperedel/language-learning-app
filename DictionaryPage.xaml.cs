@@ -77,7 +77,7 @@ public partial class DictionaryPage : ContentPage
         {
             _words.Remove(wordToRemove);
 
-            if(wordSearchBar.Text.Length > 0)
+            if(wordSearchBar.Text != null && wordSearchBar.Text.Length > 0)
             {
                 var filteredWords = _words.Where(word => word.Text.ToLower().StartsWith(wordSearchBar.Text)).ToList();
                 PopulateWordList(filteredWords);
