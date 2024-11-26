@@ -14,6 +14,7 @@ namespace LearningApp
         public DatabaseService(string dbPath)
         {
             _database = new SQLiteAsyncConnection(dbPath);
+
             _database.ExecuteAsync("CREATE TABLE IF NOT EXISTS Words (Text TEXT PRIMARY KEY)").Wait();
         }
 

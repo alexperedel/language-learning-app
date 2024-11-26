@@ -4,7 +4,7 @@
              x:Class="LearningApp.MainPage">
 
     <ScrollView>
-        <Grid Padding="20,5,20,5">
+        <Grid x:Name="MainGrid" Padding="20,5,20,5">
             <Grid.RowDefinitions>
                 <RowDefinition Height="*" />
                 <RowDefinition Height="*" />

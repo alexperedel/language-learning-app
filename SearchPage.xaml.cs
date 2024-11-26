@@ -6,13 +6,14 @@ public partial class SearchPage : ContentPage
 {
     private readonly DictionaryService _dictionaryService = new DictionaryService();
     private readonly DatabaseService _databaseService;
-    private string ?_currentWordText;
+    private string? _currentWordText;
 
     public SearchPage()
     {
         InitializeComponent();
         var dbPath = Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData), "words.db3"); ;
         _databaseService = new DatabaseService(dbPath);
+        DeviceDisplay.MainDisplayInfoChanged += OnOrientationChanged;
     }
 
     private async void OnSearchButtonPressed(object sender, EventArgs e)
@@ -36,6 +37,24 @@ public partial class SearchPage : ContentPage
 
         searchBar.Text = string.Empty;
         searchBar.Unfocus();
+    }
+
+    private void OnOrientationChanged(object sender, DisplayInfoChangedEventArgs e)
+    {
+        if (e.DisplayInfo.Orientation == DisplayOrientation.Portrait)
+        {
+            VisualStateManager.GoToState(MainLayout, "Portrait");
+        }
+        else if (e.DisplayInfo.Orientation == DisplayOrientation.Landscape)
+        {
+            VisualStateManager.GoToState(MainLayout, "Landscape");
+        }
+    }
+
+    protected override void OnDisappearing()
+    {
+        DeviceDisplay.MainDisplayInfoChanged -= OnOrientationChanged;
+        base.OnDisappearing();
     }
 
     private void DisplayWordDetails(Words wordData)
